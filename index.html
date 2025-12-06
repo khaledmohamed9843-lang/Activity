@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول الأنشطة اليومية للأطفال</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            font-family: 'Cairo', sans-serif;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            padding: 8px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .reset-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .activities-container {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .activities-container h3 {
+            color: #764ba2;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 12px;
+            padding: 10px;
+            cursor: move;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 8px;
+        }
+
+        .activity-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .activity-card:active {
+            transform: scale(0.95);
+        }
+
+        .activity-image {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin: 0 auto 5px;
+            display: block;
+        }
+
+        .activity-name {
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        .shelf-container {
+            margin-bottom: 8px;
+        }
+
+        .shelf-header {
+            border-radius: 10px 10px 0 0;
+            padding: 8px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .morning-header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .afternoon-header {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .evening-header {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #764ba2;
+        }
+
+        .shelf-body {
+            background: linear-gradient(to bottom, #8b6f47, #6b5639);
+            border-radius: 0 0 10px 10px;
+            padding: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .shelf-slot {
+            background: #5d4a35;
+            border: 3px solid #3d2f24;
+            border-radius: 10px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            margin-bottom: 8px;
+        }
+
+        .shelf-slot:hover {
+            border-color: #ffd700;
+        }
+
+        .shelf-slot.drag-over {
+            background: #6b5639;
+            border-color: #ffd700;
+        }
+
+        .shelf-slot-empty {
+            color: #3d2f24;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            z-index: 1000;
+            min-width: 400px;
+        }
+
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+
+        .success-emoji {
+            font-size: 5rem;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        .success-message h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .success-message p {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .close-popup-btn {
+            background: white;
+            color: #11998e;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .close-popup-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .content-wrapper {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            gap: 10px;
+        }
+
+        .left-section {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-section {
+            width: 70%;
+            overflow-y: auto;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-15px) scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .activity-image {
+                width: 50px;
+                height: 50px;
+            }
+            .left-section {
+                width: 35%;
+            }
+            .right-section {
+                width: 65%;
+            }
+            .success-message {
+                min-width: 300px;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>⭐ أنشطتي اليومية ⭐</h1>
+            <button class="reset-btn" onclick="resetGame()">🔄 ابدأ من جديد</button>
+        </div>
+
+        <!-- Success Overlay and Message -->
+        <div id="successOverlay" class="success-overlay" style="display: none;" onclick="closePopup()"></div>
+        <div id="successMessage" class="success-message" style="display: none;">
+            <div class="success-emoji">🎉</div>
+            <h2>أحسنت!</h2>
+            <p>   رائع! لقد خططت ليومك مثل الأبطال المنظمين !</p>
+            <button class="close-popup-btn" onclick="closePopup()">رائع!</button>
+        </div>
+
+        <!-- Main Layout: Left (Activities) and Right (Shelves) -->
+        <div class="content-wrapper">
+            <!-- Left Section: Available Activities -->
+            <div class="left-section">
+                <div id="activitiesContainer" class="activities-container">
+                    <h3>🎯 اسحب إلى اليمين!</h3>
+                    <div id="activitiesList"></div>
+                </div>
+            </div>
+
+            <!-- Right Section: Shelves -->
+            <div class="right-section">
+                <!-- Morning Shelf -->
+                <div class="shelf-container">
+                    <div class="shelf-header morning-header">
+                        <span>☀️</span>
+                        <span>الصباح</span>
+                    </div>
+                    <div class="shelf-body">
+                        <div class="row g-2" id="morningShelf"></div>
+                    </div>
+                </div>
+
+                <!-- Afternoon Shelf -->
+                <div class="shelf-container">
+                    <div class="shelf-header afternoon-header">
+                        <span>☁️</span>
+                        <span>الظهيرة</span>
+                    </div>
+                    <div class="shelf-body">
+                        <div class="row g-2" id="afternoonShelf"></div>
+                    </div>
+                </div>
+
+                <!-- Evening Shelf -->
+                <div class="shelf-container">
+                    <div class="shelf-header evening-header">
+                        <span>🌙</span>
+                        <span>المساء</span>
+                    </div>
+                    <div class="shelf-body">
+                        <div class="row g-2" id="eveningShelf"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const activityData = [
+            { id: 1, name: 'تنظيف الأسنان', image: 'https://cdn-icons-png.flaticon.com/512/2913/2913133.png', correctTime: 'morning' },
+            { id: 2, name: 'وجبة الإفطار', image: 'https://cdn-icons-png.flaticon.com/512/3075/3075977.png', correctTime: 'morning' },
+            { id: 3, name: 'ارتداء الملابس', image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png', correctTime: 'morning' },
+            { id: 4, name: 'وجبة الغداء', image: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png', correctTime: 'afternoon' },
+            { id: 5, name: 'اللعب بالخارج', image: 'https://cdn-icons-png.flaticon.com/512/857/857418.png', correctTime: 'afternoon' },
+            { id: 6, name: 'وقت الدراسة', image: 'https://cdn-icons-png.flaticon.com/512/2232/2232688.png', correctTime: 'afternoon' },
+            { id: 7, name: 'وجبة العشاء', image: 'https://cdn-icons-png.flaticon.com/512/1046/1046857.png', correctTime: 'evening' },
+            { id: 8, name: 'وقت الاستحمام', image: 'https://cdn-icons-png.flaticon.com/512/2917/2917995.png', correctTime: 'evening' },
+            { id: 9, name: 'وقت النوم', image: 'https://cdn-icons-png.flaticon.com/512/3094/3094837.png', correctTime: 'evening' }
+        ];
+
+        let activities = [];
+        let shelves = {
+            morning: [null, null, null],
+            afternoon: [null, null, null],
+            evening: [null, null, null]
+        };
+        let finishAudio = null;
+
+        function playSuccessSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 523.25;
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function playErrorSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 200;
+            oscillator.type = 'sawtooth';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function renderActivities() {
+            const container = document.getElementById('activitiesList');
+            container.innerHTML = '';
+
+            activities.forEach(activity => {
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.draggable = true;
+                card.dataset.id = activity.id;
+                card.innerHTML = `
+                    <img src="${activity.image}" alt="${activity.name}" class="activity-image">
+                    <div class="activity-name">${activity.name}</div>
+                `;
+                
+                card.addEventListener('dragstart', handleDragStart);
+                container.appendChild(card);
+            });
+
+            // Show/hide containers
+            if (activities.length === 0) {
+                // Game completed - show popup and play finish sound
+                document.getElementById('successOverlay').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'block';
+                playFinishSound();
+            }
+        }
+
+        function playFinishSound() {
+            // Stop any currently playing finish sound
+            if (finishAudio) {
+                finishAudio.pause();
+                finishAudio.currentTime = 0;
+            }
+            
+            // Try to play the finish.mp3 file
+            finishAudio = new Audio('finish.mp3');
+            finishAudio.play().catch(error => {
+                console.log('Could not play finish.mp3:', error);
+                // Fallback to generated sound if file not found
+                playGeneratedFinishSound();
+            });
+        }
+
+        function playGeneratedFinishSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create a celebration melody
+            const notes = [523.25, 587.33, 659.25, 783.99]; // C, D, E, G
+            let time = audioContext.currentTime;
+            
+            notes.forEach((freq, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = freq;
+                gainNode.gain.setValueAtTime(0.3, time);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+                
+                oscillator.start(time);
+                oscillator.stop(time + 0.3);
+                
+                time += 0.2;
+            });
+        }
+
+        function closePopup() {
+            document.getElementById('successOverlay').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function renderShelf(timeOfDay) {
+            const container = document.getElementById(timeOfDay + 'Shelf');
+            container.innerHTML = '';
+
+            shelves[timeOfDay].forEach((activity, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-4';
+                
+                const slot = document.createElement('div');
+                slot.className = 'shelf-slot';
+                slot.dataset.time = timeOfDay;
+                slot.dataset.index = index;
+                
+                if (activity) {
+                    slot.innerHTML = `
+                        <div>
+                            <img src="${activity.image}" alt="${activity.name}" class="activity-image">
+                            <div class="activity-name">${activity.name}</div>
+                        </div>
+                    `;
+                } else {
+                    slot.innerHTML = '<div class="shelf-slot-empty">+</div>';
+                }
+                
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                
+                col.appendChild(slot);
+                container.appendChild(col);
+            });
+        }
+
+        function renderAllShelves() {
+            renderShelf('morning');
+            renderShelf('afternoon');
+            renderShelf('evening');
+        }
+
+        let draggedActivity = null;
+
+        function handleDragStart(e) {
+            const id = parseInt(e.target.closest('.activity-card').dataset.id);
+            draggedActivity = activities.find(a => a.id === id);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove('drag-over');
+            
+            if (!draggedActivity) return;
+
+            const timeOfDay = slot.dataset.time;
+            const index = parseInt(slot.dataset.index);
+
+            // Check if slot is already filled
+            if (shelves[timeOfDay][index]) {
+                playErrorSound();
+                slot.classList.add('shake');
+                setTimeout(() => slot.classList.remove('shake'), 300);
+                return;
+            }
+
+            // Check if correct time
+            if (draggedActivity.correctTime === timeOfDay) {
+                playSuccessSound();
+                shelves[timeOfDay][index] = draggedActivity;
+                activities = activities.filter(a => a.id !== draggedActivity.id);
+                renderActivities();
+                renderAllShelves();
+            } else {
+                playErrorSound();
+                slot.classList.add('shake');
+                setTimeout(() => slot.classList.remove('shake'), 300);
+            }
+
+            draggedActivity = null;
+        }
+
+        function resetGame() {
+            // Stop finish sound if playing
+            if (finishAudio) {
+                finishAudio.pause();
+                finishAudio.currentTime = 0;
+            }
+            
+            // Close popup
+            closePopup();
+            
+            // Reset game state
+            activities = shuffleArray(activityData);
+            shelves = {
+                morning: [null, null, null],
+                afternoon: [null, null, null],
+                evening: [null, null, null]
+            };
+            renderActivities();
+            renderAllShelves();
+        }
+
+        // Initialize game
+        resetGame();
+    </script>
+</body>
+</html>
