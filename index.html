@@ -23,6 +23,59 @@
             flex-direction: column;
         }
 
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .start-content {
+            text-align: center;
+            color: white;
+        }
+
+        .start-content h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: bounce 1s infinite alternate;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 20px 50px;
+            border-radius: 50px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .game-container {
+            display: none;
+        }
+
+        .game-container.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
         .header {
             text-align: center;
             color: white;
@@ -88,12 +141,11 @@
             transform: scale(0.95);
         }
 
-        .activity-image {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
+        .activity-emoji {
+            font-size: 3rem;
             margin: 0 auto 5px;
             display: block;
+            text-align: center;
         }
 
         .activity-name {
@@ -257,13 +309,12 @@
             animation: shake 0.3s ease-in-out;
         }
 
-        @media (max-width: 768px) {
+            @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
             }
-            .activity-image {
-                width: 50px;
-                height: 50px;
+            .activity-emoji {
+                font-size: 2.5rem;
             }
             .left-section {
                 width: 35%;
@@ -275,11 +326,27 @@
                 min-width: 300px;
                 padding: 30px 20px;
             }
+            .start-content h1 {
+                font-size: 2rem;
+            }
+            .start-btn {
+                font-size: 1.2rem;
+                padding: 15px 40px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
+    <!-- Start Screen -->
+    <div id="startScreen" class="start-screen">
+        <div class="start-content">
+            <h1>⭐ أنشطتي اليومية ⭐</h1>
+            <button class="start-btn" onclick="startGame()">🎮 ابدأ اللعب</button>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="gameContainer" class="main-container game-container">
         <!-- Header -->
         <div class="header">
             <h1>⭐ أنشطتي اليومية ⭐</h1>
@@ -291,8 +358,7 @@
         <div id="successMessage" class="success-message" style="display: none;">
             <div class="success-emoji">🎉</div>
             <h2>أحسنت!</h2>
-            <p>   رائع! لقد خططت ليومك مثل الأبطال المنظمين !</p>
-            <button class="close-popup-btn" onclick="closePopup()">رائع!</button>
+            <p>رائع! لقد خططت ليومك مثل الأبطال المنظمين!</p>
         </div>
 
         <!-- Main Layout: Left (Activities) and Right (Shelves) -->
@@ -346,15 +412,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
         const activityData = [
-            { id: 1, name: 'تنظيف الأسنان', image: 'https://cdn-icons-png.flaticon.com/512/2913/2913133.png', correctTime: 'morning' },
-            { id: 2, name: 'وجبة الإفطار', image: 'https://cdn-icons-png.flaticon.com/512/3075/3075977.png', correctTime: 'morning' },
-            { id: 3, name: 'ارتداء الملابس', image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png', correctTime: 'morning' },
-            { id: 4, name: 'وجبة الغداء', image: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png', correctTime: 'afternoon' },
-            { id: 5, name: 'اللعب بالخارج', image: 'https://cdn-icons-png.flaticon.com/512/857/857418.png', correctTime: 'afternoon' },
-            { id: 6, name: 'وقت الدراسة', image: 'https://cdn-icons-png.flaticon.com/512/2232/2232688.png', correctTime: 'afternoon' },
-            { id: 7, name: 'وجبة العشاء', image: 'https://cdn-icons-png.flaticon.com/512/1046/1046857.png', correctTime: 'evening' },
-            { id: 8, name: 'وقت الاستحمام', image: 'https://cdn-icons-png.flaticon.com/512/2917/2917995.png', correctTime: 'evening' },
-            { id: 9, name: 'وقت النوم', image: 'https://cdn-icons-png.flaticon.com/512/3094/3094837.png', correctTime: 'evening' }
+            { id: 1, name: '🚌 الذهاب للمدرسه', emoji: '🚌', correctTime: 'morning' },
+            { id: 2, name: '🍳 وجبة الإفطار', emoji: '🍳🥪🥐', correctTime: 'morning' },
+            { id: 3, name: '👕 ارتداء الملابس', emoji: '👕', correctTime: 'morning' },
+            { id: 4, name: '🍽️ وجبة الغداء', emoji: '🍗🥘🥣', correctTime: 'afternoon' },
+            { id: 5, name: '⚽ اللعب بالخارج', emoji: '⚽', correctTime: 'afternoon' },
+            { id: 6, name: '📚 وقت الدراسة', emoji: '📚', correctTime: 'afternoon' },
+            { id: 7, name: '🍲 وجبة العشاء', emoji: '🍎🧀🥤', correctTime: 'evening' },
+            { id: 8, name: '🛁 وقت الاستحمام', emoji: '💧🛁', correctTime: 'evening' },
+            { id: 9, name: '😴 وقت النوم', emoji: '😴', correctTime: 'evening' }
         ];
 
         let activities = [];
@@ -364,6 +430,19 @@
             evening: [null, null, null]
         };
         let finishAudio = null;
+        let startAudio = null;
+
+        function startGame() {
+            // Play start sound
+            startAudio = new Audio('start.mp3');
+            startAudio.play().catch(error => {
+                console.log('Could not play start.mp3:', error);
+            });
+
+            // Hide start screen and show game
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameContainer').classList.add('active');
+        }
 
         function playSuccessSound() {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -417,7 +496,7 @@
                 card.draggable = true;
                 card.dataset.id = activity.id;
                 card.innerHTML = `
-                    <img src="${activity.image}" alt="${activity.name}" class="activity-image">
+                    <div class="activity-emoji">${activity.emoji}</div>
                     <div class="activity-name">${activity.name}</div>
                 `;
                 
@@ -427,9 +506,15 @@
 
             // Show/hide containers
             if (activities.length === 0) {
-                // Game completed - show popup and play finish sound
+                // Game completed - show popup with initial message (without restart button)
+                const successMsg = document.getElementById('successMessage');
+                successMsg.innerHTML = `
+                    <div class="success-emoji">🎉</div>
+                    <h2>أحسنت!</h2>
+                    <p>رائع! لقد خططت ليومك مثل الأبطال المنظمين!</p>
+                `;
                 document.getElementById('successOverlay').style.display = 'block';
-                document.getElementById('successMessage').style.display = 'block';
+                successMsg.style.display = 'block';
                 playFinishSound();
             }
         }
@@ -443,11 +528,30 @@
             
             // Try to play the finish.mp3 file
             finishAudio = new Audio('finish.mp3');
+            
+            // When sound ends, show the restart button
+            finishAudio.addEventListener('ended', function() {
+                showRestartOption();
+            });
+            
             finishAudio.play().catch(error => {
                 console.log('Could not play finish.mp3:', error);
                 // Fallback to generated sound if file not found
                 playGeneratedFinishSound();
+                // Show restart immediately if sound file doesn't exist
+                setTimeout(showRestartOption, 2000);
             });
+        }
+
+        function showRestartOption() {
+            // Update the success message to show restart button
+            const successMsg = document.getElementById('successMessage');
+            successMsg.innerHTML = `
+                <div class="success-emoji">🎉</div>
+                <h2>أحسنت!</h2>
+                <p>رائع! لقد خططت ليومك مثل الأبطال المنظمين!</p>
+                <button class="close-popup-btn" onclick="resetGame()">🔄 العب مرة أخرى</button>
+            `;
         }
 
         function playGeneratedFinishSound() {
@@ -496,7 +600,7 @@
                 if (activity) {
                     slot.innerHTML = `
                         <div>
-                            <img src="${activity.image}" alt="${activity.name}" class="activity-image">
+                            <div class="activity-emoji">${activity.emoji}</div>
                             <div class="activity-name">${activity.name}</div>
                         </div>
                     `;
@@ -593,7 +697,11 @@
         }
 
         // Initialize game
-        resetGame();
+        window.addEventListener('DOMContentLoaded', function() {
+            activities = shuffleArray(activityData);
+            renderActivities();
+            renderAllShelves();
+        });
     </script>
 </body>
 </html>
